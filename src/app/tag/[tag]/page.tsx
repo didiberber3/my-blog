@@ -1,23 +1,36 @@
-import Link from 'next/link';
 import { getPosts } from '@/lib/posts';
 import { blogConfig } from '@/lib/config';
-
-// Force dynamic rendering so the posts list reflects newly added files without a rebuild
-export const dynamic = 'force-dynamic';
+import Link from 'next/link';
 import { format } from 'date-fns';
 
-export default async function Home() {
+export const dynamic = 'force-dynamic';
+
+export default async function TagPage({ params }: { params: Promise<{ tag: string }> | { tag: string } }) {
+  const resolvedParams = await Promise.resolve(params);
+  const tag = decodeURIComponent(resolvedParams.tag);
+  
   const posts = await getPosts();
+  const taggedPosts = posts.filter(post => post.tags && post.tags.includes(tag));
+
   return (
     <main className="max-w-[60%] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold mb-8 w-full"><svg className="w-10 h-10" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z" /></svg>{blogConfig.blog.homeTitle} </h1>
-      <ul className="space-y-4">
-        {posts.length === 0 ? (
-          <li className="text-[var(--text-light)] dark:text-[var(--text-dark)] opacity-60">
-            {blogConfig.posts.noPostsMessage}
-          </li>
-        ) : (
-          posts.map(p => (
+      <div className="mb-6">
+        <Link href="/archive" className="text-sm text-[var(--text-light)] dark:text-[var(--text-dark)] hover:underline opacity-60">
+          ← 返回归档
+        </Link>
+      </div>
+      
+      <h1 className="text-3xl font-bold mb-8">
+        标签: {tag}
+      </h1>
+      
+      {taggedPosts.length === 0 ? (
+        <p className="text-[var(--text-light)] dark:text-[var(--text-dark)] opacity-60">
+          没有找到包含标签 "{tag}" 的文章
+        </p>
+      ) : (
+        <ul className="space-y-4">
+          {taggedPosts.map(p => (
             <li key={p.slug}>
               <Link href={`/posts/${encodeURIComponent(p.slug)}`} className="block hover:opacity-70 transition-opacity">
                 <div className="flex justify-between items-center p-4 border-b border-[var(--line-light)] dark:border-[var(--line-dark)]">
@@ -31,21 +44,14 @@ export default async function Home() {
                           </span>
                         )}
                         {p.category && (
-                          <Link
-                            href={`/category/${encodeURIComponent(p.category)}`}
-                            className="text-xs bg-[var(--category-bg)] text-[var(--category-text)] px-2 py-1 rounded-md border border-[var(--line-light)] dark:border-[var(--line-dark)] hover:opacity-80 transition-opacity"
-                          >
+                          <span className="text-xs bg-[var(--line-light)] dark:bg-[var(--line-dark)] px-2 py-0.5">
                             {p.category}
-                          </Link>
+                          </span>
                         )}
                         {p.tags && p.tags.map((tag, index) => (
-                          <Link
-                            key={index}
-                            href={`/tag/${encodeURIComponent(tag)}`}
-                            className="text-xs bg-[var(--tag-bg)] text-[var(--tag-text)] px-2 py-1 rounded-sm border border-[var(--line-light)] dark:border-[var(--line-dark)] hover:opacity-80 transition-opacity"
-                          >
+                          <span key={index} className="text-xs bg-[var(--line-light)] dark:bg-[var(--line-dark)] px-2 py-0.5">
                             {tag}
-                          </Link>
+                          </span>
                         ))}
                       </div>
                     )}
@@ -56,9 +62,24 @@ export default async function Home() {
                 </div>
               </Link>
             </li>
-          ))
-        )}
-      </ul>
+          ))}
+        </ul>
+      )}
     </main>
   );
+}
+
+export async function generateStaticParams() {
+  const posts = await getPosts();
+  const tagSet = new Set<string>();
+  
+  posts.forEach(post => {
+    if (post.tags) {
+      post.tags.forEach(tag => tagSet.add(tag));
+    }
+  });
+  
+  return Array.from(tagSet).map(tag => ({
+    tag: encodeURIComponent(tag)
+  }));
 }

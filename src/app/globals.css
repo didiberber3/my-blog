@@ -1,26 +1,55 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: oklch(0.99 0 0);
+    --foreground: oklch(0.25 0 0);
+    --category-bg: oklch(0.8 0 0);
+    --category-text: oklch(0.25 0 0);
+    --tag-bg: oklch(0.9 0 0);
+    --tag-text: oklch(0.4 0 0);
+    --line-light: oklch(0.9 0 0);
+    --archive-bg: oklch(0.85 0 0);
+  }
+  .dark {
+    --background: oklch(0.15 0 0);
+    --foreground: oklch(0.92 0 0);
+    --category-bg: oklch(0.35 0 0);
+    --category-text: oklch(0.75 0 0);
+    --tag-bg: oklch(0.2 0 0);
+    --tag-text: oklch(0.8 0 0);
+    --line-dark: oklch(0.3 0 0);
+    --archive-bg: oklch(0.35 0 0);
+  }
+  html {
+    scroll-behavior: smooth;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .btn {
+    @apply px-3 py-1.5 rounded border border-primary text-primary hover:bg-primary hover:text-white transition;
+  }
+}
+
+/* 文章标题样式 - 移除下划线，悬停时显示 */
+.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+  @apply no-underline hover:underline transition-all duration-200 cursor-pointer;
+  position: relative;
+}
+
+.prose h1:hover::before, .prose h2:hover::before, .prose h3:hover::before, 
+.prose h4:hover::before, .prose h5:hover::before, .prose h6:hover::before {
+  content: attr(data-level);
+  @apply absolute -left-6 text-gray-400 dark:text-gray-600 text-sm font-mono opacity-70;
+}
+
+/* 代码块自动换行 + 横向滚动 */
+.prose pre {
+  @apply max-w-full overflow-x-auto;
+}
+.prose pre code {
+  @apply whitespace-pre-wrap break-all;
 }
