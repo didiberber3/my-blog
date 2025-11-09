@@ -3,6 +3,7 @@ title: Hello World
 date: 1999-01-08
 tags: Getting Started
 category: Note
+archive: 1999
 ---
 
 ## 第一段
@@ -53,4 +54,3 @@ function hello() {
 - ✅ 响应式设计
 - ✅ SEO 优化
 - ✅ 自动部署
-

@@ -74,7 +74,7 @@ export async function generateStaticParams() {
   const archives = [...new Set(posts.map(post => post.archive).filter(Boolean))];
   
   return archives.map(archive => ({
-    archive: archive,
+    archive: (archive as string | number).toString(),
   }));
 }
 
