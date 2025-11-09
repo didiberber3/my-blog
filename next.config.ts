@@ -5,8 +5,8 @@ const nextConfig: NextConfig = {
   output: 'export',
   distDir: 'out',
   
-  // 用户仓库不需要 basePath，直接使用根域名
-  basePath: "",
+  
+  basePath: "/didiberber3-github.io",
   
   // 图片优化配置
   images: {
